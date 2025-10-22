@@ -1,0 +1,5 @@
+{
+  "name": "ShadowHawk Insider Threat Dashboard",
+  "description": "A real-time admin dashboard for the ShadowHawk cybersecurity solution, designed to monitor endpoint telemetry, detect insider threats, and enable administrative response actions.",
+  "requestFramePermissions": []
+}
