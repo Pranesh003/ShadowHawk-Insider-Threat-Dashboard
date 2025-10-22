@@ -7,44 +7,20 @@ import { EventLogItem, Endpoint, RiskLevel, EventType, FilterState, EndpointStat
 import { generateInitialEndpoints, generateNewEvent } from './services/mockApi';
 import { DEFAULT_FILTERS, DEFAULT_SETTINGS, DATA_RETENTION_OPTIONS } from './constants';
 import { UserProvider } from './contexts/UserContext';
-import { ToastProvider, useToast } from './contexts/ToastContext';
-import { ToastContainer } from './components/common/ToastContainer';
 
 const MAX_EVENTS = 500; // Increased to accommodate event bursts
 
-const AppComponent: React.FC = () => {
+const AppContent: React.FC = () => {
     const [events, setEvents] = useState<EventLogItem[]>([]);
     const [endpoints, setEndpoints] = useState<Endpoint[]>(generateInitialEndpoints());
     const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
     const [searchTerm, setSearchTerm] = useState('');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [settings, setSettings] = useState<SettingsState>(DEFAULT_SETTINGS);
-    const { addToast } = useToast();
 
     const addEvents = useCallback((newEvents: EventLogItem[]) => {
-        const endpointMap = new Map(endpoints.map(e => [e.id, e]));
-
-        newEvents.forEach(event => {
-            if (event.riskLevel === RiskLevel.CRITICAL) {
-                const endpoint = endpointMap.get(event.endpointId);
-                let description = `High-risk activity detected on ${endpoint?.hostname || 'Unknown'}.`;
-
-                if (event.eventType === EventType.PROCESS && event.details.isSuspicious) {
-                    description = `Suspicious process '${event.details.processName}' started on ${endpoint?.hostname}.`;
-                } else if (event.eventType === EventType.USB && event.action === 'Connected' && event.details.isUntrusted) {
-                    description = `Untrusted USB device connected to ${endpoint?.hostname}.`;
-                }
-                
-                addToast({
-                    type: 'critical',
-                    title: `Critical Alert: ${event.eventType}`,
-                    description,
-                });
-            }
-        });
-
         setEvents(prevEvents => [...newEvents, ...prevEvents].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, MAX_EVENTS));
-    }, [addToast, endpoints]);
+    }, []);
 
     // Effect for real-time data and agent reconnection simulation
     useEffect(() => {
@@ -246,7 +222,6 @@ const AppComponent: React.FC = () => {
                     onSettingsChange={handleSettingsChange}
                 />
             </div>
-            <ToastContainer />
         </div>
     );
 };
@@ -254,9 +229,7 @@ const AppComponent: React.FC = () => {
 const App: React.FC = () => {
     return (
         <UserProvider>
-            <ToastProvider>
-                <AppComponent />
-            </ToastProvider>
+            <AppContent />
         </UserProvider>
     );
 };

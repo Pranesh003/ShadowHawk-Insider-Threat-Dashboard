@@ -1,4 +1,5 @@
 
+
 export enum UserRole {
     ADMINISTRATOR = 'Administrator',
     ANALYST = 'Security Analyst',
@@ -161,6 +162,7 @@ export interface SettingsState {
     dataRetentionPeriod: string;
 }
 
+// FIX: Add ToastMessage interface to resolve compilation errors.
 export interface ToastMessage {
   id: string;
   type: 'info' | 'success' | 'warning' | 'critical';
